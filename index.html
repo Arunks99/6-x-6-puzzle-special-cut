@@ -2,12 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coconut Jigsaw Puzzle Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Touch Drag Jigsaw</title>
   <style>
     body {
       font-family: sans-serif;
-      margin: 20px;
       text-align: center;
     }
 
@@ -23,14 +22,14 @@
       height: 50px;
       object-fit: cover;
       border: none;
-      padding: 0;
     }
 
     .empty-tile {
       width: 50px;
       height: 50px;
       background: white;
-      border: 1px solid #ccc;
+      border: 1px dashed #aaa;
+      position: relative;
     }
 
     .rotating-pieces {
@@ -41,25 +40,35 @@
       gap: 10px;
     }
 
-    .rotatable-piece {
+    .draggable {
       width: 50px;
       height: 50px;
-      cursor: grab;
-      transition: transform 0.2s;
       object-fit: cover;
+      touch-action: none;
+      position: absolute;
+      z-index: 1000;
+      pointer-events: auto;
+      user-select: none;
+    }
+
+    .piece-wrapper {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      display: inline-block;
     }
   </style>
 </head>
 <body>
-  <h1>Jigsaw Puzzle Game</h1>
+  <h1>Touch-Drag Jigsaw</h1>
   <div id="root"></div>
 
-  <!-- React and Babel -->
+  <!-- React + Babel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.9/babel.min.js"></script>
 
-  <!-- Inline React Code -->
+  <!-- Script -->
   <script type="text/babel">
     const imageGrid = [
       ["1a", "1b", "1c", "1d", "1e", "1f", "1g", "1h", "1i"],
@@ -96,79 +105,102 @@
 
     const missingPieces = getRandomPieces(6);
 
-    function PuzzleGrid({ placedPieces, handleDrop }) {
+    function PuzzleGrid({ placed, onDrop }) {
       return (
         <div className="grid">
-          {imageGrid.flat().map((piece) => {
-            const isMissing = missingPieces.includes(piece);
-            const filledPiece = placedPieces[piece];
-
-            return isMissing ? (
+          {imageGrid.flat().map((id) => {
+            const isMissing = missingPieces.includes(id);
+            return (
               <div
-                key={piece}
+                key={id}
                 className="empty-tile"
+                onTouchStart={(e) => e.preventDefault()}
                 onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => handleDrop(e, piece)}
+                onDrop={(e) => {
+                  const data = e.dataTransfer.getData("text/plain");
+                  onDrop(id, data);
+                }}
               >
-                {filledPiece && (
-                  <img
-                    src={`${imageBaseUrl}${imageMap[filledPiece]}`}
-                    alt={filledPiece}
-                    className="puzzle-piece"
-                  />
-                )}
+                {!isMissing ? (
+                  <img className="puzzle-piece" src={`${imageBaseUrl}${imageMap[id]}`} />
+                ) : placed[id] ? (
+                  <img className="puzzle-piece" src={`${imageBaseUrl}${imageMap[placed[id]]}`} />
+                ) : null}
               </div>
-            ) : (
-              <img
-                key={piece}
-                src={`${imageBaseUrl}${imageMap[piece]}`}
-                alt={piece}
-                className="puzzle-piece"
-              />
             );
           })}
         </div>
       );
     }
 
-    function RotatingPieces({ pieces }) {
+    function AnswerPieces({ remaining, onTouchStart }) {
       return (
         <div className="rotating-pieces">
-          {pieces.map((piece) => (
-            <img
+          {remaining.map((piece) => (
+            <div
+              className="piece-wrapper"
               key={piece}
-              src={`${imageBaseUrl}${imageMap[piece]}`}
-              alt={piece}
-              className="rotatable-piece"
               draggable
-              onDragStart={(e) => {
-                e.dataTransfer.setData("text/plain", piece);
-              }}
-            />
+              onDragStart={(e) => e.dataTransfer.setData("text/plain", piece)}
+              onTouchStart={(e) => onTouchStart(e, piece)}
+            >
+              <img
+                className="draggable"
+                src={`${imageBaseUrl}${imageMap[piece]}`}
+              />
+            </div>
           ))}
         </div>
       );
     }
 
     function App() {
-      const [placedPieces, setPlacedPieces] = React.useState({});
-      const [remainingPieces, setRemainingPieces] = React.useState(missingPieces);
+      const [placed, setPlaced] = React.useState({});
+      const [remaining, setRemaining] = React.useState([...missingPieces]);
 
-      const handleDrop = (e, targetPiece) => {
-        const draggedPiece = e.dataTransfer.getData("text/plain");
-
-        if (draggedPiece === targetPiece) {
-          setPlacedPieces({ ...placedPieces, [targetPiece]: draggedPiece });
-          setRemainingPieces(remainingPieces.filter((p) => p !== draggedPiece));
+      const handleDrop = (target, piece) => {
+        if (target === piece) {
+          setPlaced((prev) => ({ ...prev, [target]: piece }));
+          setRemaining((prev) => prev.filter((p) => p !== piece));
         } else {
-          alert("Incorrect piece. Try again.");
+          alert("Wrong piece! Try again.");
         }
+      };
+
+      const handleTouchStart = (e, piece) => {
+        const img = e.target.cloneNode(true);
+        img.style.position = "absolute";
+        img.style.left = e.touches[0].clientX - 25 + "px";
+        img.style.top = e.touches[0].clientY - 25 + "px";
+        document.body.appendChild(img);
+
+        const move = (moveEvent) => {
+          img.style.left = moveEvent.touches[0].clientX - 25 + "px";
+          img.style.top = moveEvent.touches[0].clientY - 25 + "px";
+        };
+
+        const end = (endEvent) => {
+          const touch = endEvent.changedTouches[0];
+          const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (dropTarget?.classList.contains("empty-tile")) {
+            const targetId = dropTarget.getAttribute("data-id") || dropTarget.dataset?.id;
+            if (targetId) {
+              handleDrop(targetId, piece);
+            }
+          }
+          img.remove();
+          document.removeEventListener("touchmove", move);
+          document.removeEventListener("touchend", end);
+        };
+
+        document.addEventListener("touchmove", move);
+        document.addEventListener("touchend", end);
       };
 
       return (
         <div>
-          <PuzzleGrid placedPieces={placedPieces} handleDrop={handleDrop} />
-          <RotatingPieces pieces={remainingPieces} />
+          <PuzzleGrid placed={placed} onDrop={handleDrop} />
+          <AnswerPieces remaining={remaining} onTouchStart={handleTouchStart} />
         </div>
       );
     }

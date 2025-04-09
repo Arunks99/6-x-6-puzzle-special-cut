@@ -2,29 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fixed Jigsaw Puzzle Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coconut Jigsaw Puzzle Game</title>
   <style>
     body {
       font-family: sans-serif;
       margin: 20px;
       text-align: center;
     }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(9, 50px);
-      grid-gap: 0.5px;
+      grid-gap: 1px;
       justify-content: center;
     }
-    .puzzle-piece, .placeholder {
+
+    .puzzle-piece {
       width: 50px;
       height: 50px;
       object-fit: cover;
+      border: none;
+      padding: 0;
     }
-    .placeholder {
+
+    .empty-tile {
+      width: 50px;
+      height: 50px;
       background: white;
-      border: 1px dashed #aaa;
+      border: 1px solid #ccc;
     }
+
     .rotating-pieces {
       margin-top: 20px;
       display: flex;
@@ -32,44 +40,53 @@
       flex-wrap: wrap;
       gap: 10px;
     }
+
     .rotatable-piece {
       width: 50px;
       height: 50px;
-      cursor: pointer;
+      cursor: grab;
       transition: transform 0.2s;
       object-fit: cover;
     }
   </style>
 </head>
 <body>
-  <h1>Fixed Jigsaw Puzzle Game</h1>
+  <h1>Jigsaw Puzzle Game</h1>
   <div id="root"></div>
 
-  <!-- React + Babel -->
+  <!-- React and Babel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.9/babel.min.js"></script>
 
+  <!-- Inline React Code -->
   <script type="text/babel">
     const imageGrid = [
-      ["1a","1b","1c","1d","1e","1f","1g","1h","1i"],
-      ["2a","2b","2c","2d","2e","2f","2g","2h","2i"],
-      ["3a","3b","3c","3d","3e","3f","3g","3h","3i"],
-      ["4a","4b","4c","4d","4e","4f","4g","4h","4i"],
-      ["5a","5b","5c","5d","5e","5f","5g","5h","5i"],
-      ["6a","6b","6c","6d","6e","6f","6g","6h","6i"],
-      ["7a","7b","7c","7d","7e","7f","7g","7h","7i"]
+      ["1a", "1b", "1c", "1d", "1e", "1f", "1g", "1h", "1i"],
+      ["2a", "2b", "2c", "2d", "2e", "2f", "2g", "2h", "2i"],
+      ["3a", "3b", "3c", "3d", "3e", "3f", "3g", "3h", "3i"],
+      ["4a", "4b", "4c", "4d", "4e", "4f", "4g", "4h", "4i"],
+      ["5a", "5b", "5c", "5d", "5e", "5f", "5g", "5h", "5i"],
+      ["6a", "6b", "6c", "6d", "6e", "6f", "6g", "6h", "6i"],
+      ["7a", "7b", "7c", "7d", "7e", "7f", "7g", "7h", "7i"]
     ];
 
     const imageBaseUrl = "https://i.postimg.cc/";
     const imageMap = {
-      "1a": "j5NS24js/1a.png", "1b": "L5p61gqj/1b.png", "1c": "vTt8L89k/1c.png", "1d": "SNmxQ8bh/1d.png", "1e": "QNQMrmPm/1e.png", "1f": "02Z2zQ9J/1f.png", "1g": "zGBDKrf2/1g.png", "1h": "DzhwfHqc/1h.png", "1i": "TP5RNJgr/1i.png",
-      "2a": "GhgdMBkY/2a.png", "2b": "50wfb9Py/2b.png", "2c": "0Qvs67sg/2c.png", "2d": "cChZt9GN/2d.png", "2e": "J75RFnDd/2e.png", "2f": "jdqRYbyq/2f.png", "2g": "GhMdc5jF/2g.png", "2h": "Vkpwt0p5/2h.png", "2i": "W1hjtw9Q/2i.png",
-      "3a": "N0XckfvD/3a.png", "3b": "s27zDwb9/3b.png", "3c": "j5rrg0sb/3c.png", "3d": "DwtFTtpw/3d.png", "3e": "L5xK8Jj9/3e.png", "3f": "kgV9LncH/3f.png", "3g": "02N1HCqb/3g.png", "3h": "tJCGkyJ2/3h.png", "3i": "FHd5hszv/3i.png",
-      "4a": "VkxyvQ0C/4a.png", "4b": "rpxBtn5Y/4b.png", "4c": "0QChVzWY/4c.png", "4d": "Hxmf0w2W/4d.png", "4e": "brNWWqWK/4e.png", "4f": "4yLqTrTn/4f.png", "4g": "2j2PvBBm/4g.png", "4h": "kXHzY3cp/4h.png", "4i": "QxCvqxp7/4i.png",
-      "5a": "2SBJPc98/5a.png", "5b": "WbzPJ2Q4/5b.png", "5c": "vmrKm1dJ/5c.png", "5d": "dtfc2bYj/5d.png", "5e": "j5RFnsxL/5e.png", "5f": "QtxN17Y9/5f.png", "5g": "XqzHPdwC/5g.png", "5h": "fLC6JFCX/5h.png", "5i": "2jcK3RPS/5i.png",
-      "6a": "tgzCskkG/6a.png", "6b": "mgMXdchP/6b.png", "6c": "j2jBNX31/6c.png", "6d": "R0LPBj79/6d.png", "6e": "vTSkvVpZ/6e.png", "6f": "XJ2QZd1z/6f.png", "6g": "9Xx626rH/6g.png", "6h": "SR3ddqhL/6h.png", "6i": "hPQpjJL2/6i.png",
-      "7a": "P5GK8tKT/7a.png", "7b": "cLQhRV5Y/7b.png", "7c": "R04RXXjY/7c.png", "7d": "GpKjNvRm/7d.png", "7e": "tTgzH7Rt/7e.png", "7f": "Jnd57mGw/7f.png", "7g": "mkzNtqHP/7g.png", "7h": "Bbr5DgTM/7h.png", "7i": "fWJ6cR79/7i.png"
+      "1a": "j5NS24js/1a.png", "1b": "L5p61gqj/1b.png", "1c": "vTt8L89k/1c.png", "1d": "SNmxQ8bh/1d.png",
+      "1e": "QNQMrmPm/1e.png", "1f": "02Z2zQ9J/1f.png", "1g": "zGBDKrf2/1g.png", "1h": "DzhwfHqc/1h.png", "1i": "TP5RNJgr/1i.png",
+      "2a": "GhgdMBkY/2a.png", "2b": "50wfb9Py/2b.png", "2c": "0Qvs67sg/2c.png", "2d": "cChZt9GN/2d.png",
+      "2e": "J75RFnDd/2e.png", "2f": "jdqRYbyq/2f.png", "2g": "GhMdc5jF/2g.png", "2h": "Vkpwt0p5/2h.png", "2i": "W1hjtw9Q/2i.png",
+      "3a": "N0XckfvD/3a.png", "3b": "s27zDwb9/3b.png", "3c": "j5rrg0sb/3c.png", "3d": "DwtFTtpw/3d.png",
+      "3e": "L5xK8Jj9/3e.png", "3f": "kgV9LncH/3f.png", "3g": "02N1HCqb/3g.png", "3h": "tJCGkyJ2/3h.png", "3i": "FHd5hszv/3i.png",
+      "4a": "VkxyvQ0C/4a.png", "4b": "rpxBtn5Y/4b.png", "4c": "0QChVzWY/4c.png", "4d": "Hxmf0w2W/4d.png",
+      "4e": "brNWWqWK/4e.png", "4f": "4yLqTrTn/4f.png", "4g": "2j2PvBBm/4g.png", "4h": "kXHzY3cp/4h.png", "4i": "QxCvqxp7/4i.png",
+      "5a": "2SBJPc98/5a.png", "5b": "WbzPJ2Q4/5b.png", "5c": "vmrKm1dJ/5c.png", "5d": "dtfc2bYj/5d.png",
+      "5e": "j5RFnsxL/5e.png", "5f": "QtxN17Y9/5f.png", "5g": "XqzHPdwC/5g.png", "5h": "fLC6JFCX/5h.png", "5i": "2jcK3RPS/5i.png",
+      "6a": "tgzCskkG/6a.png", "6b": "mgMXdchP/6b.png", "6c": "j2jBNX31/6c.png", "6d": "R0LPBj79/6d.png",
+      "6e": "vTSkvVpZ/6e.png", "6f": "XJ2QZd1z/6f.png", "6g": "9Xx626rH/6g.png", "6h": "SR3ddqhL/6h.png", "6i": "hPQpjJL2/6i.png",
+      "7a": "P5GK8tKT/7a.png", "7b": "cLQhRV5Y/7b.png", "7c": "R04RXXjY/7c.png", "7d": "GpKjNvRm/7d.png",
+      "7e": "tTgzH7Rt/7e.png", "7f": "Jnd57mGw/7f.png", "7g": "mkzNtqHP/7g.png", "7h": "Bbr5DgTM/7h.png", "7i": "fWJ6cR79/7i.png"
     };
 
     const getRandomPieces = (count) => {
@@ -79,60 +96,53 @@
 
     const missingPieces = getRandomPieces(6);
 
-    function PuzzleGrid() {
+    function PuzzleGrid({ placedPieces, handleDrop }) {
       return (
         <div className="grid">
           {imageGrid.flat().map((piece) => {
-            if (missingPieces.includes(piece)) {
-              return (
-                <div
-                  key={piece}
-                  className="placeholder"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    const draggedPiece = e.dataTransfer.getData("text/plain");
-                    if (draggedPiece === piece) {
-                      e.target.innerHTML = `<img src="${imageBaseUrl}${imageMap[piece]}" class="puzzle-piece"/>`;
-                    } else {
-                      alert("Wrong piece!");
-                    }
-                  }}
-                ></div>
-              );
-            } else {
-              return (
-                <img
-                  key={piece}
-                  src={`${imageBaseUrl}${imageMap[piece]}`}
-                  alt={piece}
-                  className="puzzle-piece"
-                />
-              );
-            }
+            const isMissing = missingPieces.includes(piece);
+            const filledPiece = placedPieces[piece];
+
+            return isMissing ? (
+              <div
+                key={piece}
+                className="empty-tile"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => handleDrop(e, piece)}
+              >
+                {filledPiece && (
+                  <img
+                    src={`${imageBaseUrl}${imageMap[filledPiece]}`}
+                    alt={filledPiece}
+                    className="puzzle-piece"
+                  />
+                )}
+              </div>
+            ) : (
+              <img
+                key={piece}
+                src={`${imageBaseUrl}${imageMap[piece]}`}
+                alt={piece}
+                className="puzzle-piece"
+              />
+            );
           })}
         </div>
       );
     }
 
-    function RotatingPieces() {
+    function RotatingPieces({ pieces }) {
       return (
         <div className="rotating-pieces">
-          {missingPieces.map((piece) => (
+          {pieces.map((piece) => (
             <img
               key={piece}
               src={`${imageBaseUrl}${imageMap[piece]}`}
               alt={piece}
               className="rotatable-piece"
-              draggable="true"
-              onClick={(e) => {
-                const angle = parseInt(e.target.dataset.angle || "0");
-                const newAngle = (angle + 90) % 360;
-                e.target.style.transform = `rotate(${newAngle}deg)`;
-                e.target.dataset.angle = newAngle;
-              }}
+              draggable
               onDragStart={(e) => {
                 e.dataTransfer.setData("text/plain", piece);
-                e.dataTransfer.effectAllowed = "move";
               }}
             />
           ))}
@@ -141,11 +151,24 @@
     }
 
     function App() {
+      const [placedPieces, setPlacedPieces] = React.useState({});
+      const [remainingPieces, setRemainingPieces] = React.useState(missingPieces);
+
+      const handleDrop = (e, targetPiece) => {
+        const draggedPiece = e.dataTransfer.getData("text/plain");
+
+        if (draggedPiece === targetPiece) {
+          setPlacedPieces({ ...placedPieces, [targetPiece]: draggedPiece });
+          setRemainingPieces(remainingPieces.filter((p) => p !== draggedPiece));
+        } else {
+          alert("Incorrect piece. Try again.");
+        }
+      };
+
       return (
         <div>
-          <PuzzleGrid />
-          <h3>Drag these into the puzzle ↑</h3>
-          <RotatingPieces />
+          <PuzzleGrid placedPieces={placedPieces} handleDrop={handleDrop} />
+          <RotatingPieces pieces={remainingPieces} />
         </div>
       );
     }

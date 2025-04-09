@@ -1,44 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>tiffin</title>
-  
-
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coconut Jigsaw Puzzle Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fixed Jigsaw Puzzle Game</title>
   <style>
     body {
       font-family: sans-serif;
       margin: 20px;
       text-align: center;
     }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(9, 50px);
       grid-gap: 0.5px;
       justify-content: center;
     }
-
     .puzzle-piece, .placeholder {
       width: 50px;
       height: 50px;
       object-fit: cover;
     }
-
     .placeholder {
       background: white;
       border: 1px dashed #aaa;
     }
-
     .rotating-pieces {
       margin-top: 20px;
       display: flex;
@@ -46,7 +32,6 @@
       flex-wrap: wrap;
       gap: 10px;
     }
-
     .rotatable-piece {
       width: 50px;
       height: 50px;
@@ -57,23 +42,23 @@
   </style>
 </head>
 <body>
-  <h1>Jigsaw Puzzle Game</h1>
+  <h1>Fixed Jigsaw Puzzle Game</h1>
   <div id="root"></div>
 
-  <!-- React and Babel -->
+  <!-- React + Babel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.9/babel.min.js"></script>
 
   <script type="text/babel">
     const imageGrid = [
-      ["1a", "1b", "1c", "1d", "1e", "1f", "1g", "1h", "1i"],
-      ["2a", "2b", "2c", "2d", "2e", "2f", "2g", "2h", "2i"],
-      ["3a", "3b", "3c", "3d", "3e", "3f", "3g", "3h", "3i"],
-      ["4a", "4b", "4c", "4d", "4e", "4f", "4g", "4h", "4i"],
-      ["5a", "5b", "5c", "5d", "5e", "5f", "5g", "5h", "5i"],
-      ["6a", "6b", "6c", "6d", "6e", "6f", "6g", "6h", "6i"],
-      ["7a", "7b", "7c", "7d", "7e", "7f", "7g", "7h", "7i"]
+      ["1a","1b","1c","1d","1e","1f","1g","1h","1i"],
+      ["2a","2b","2c","2d","2e","2f","2g","2h","2i"],
+      ["3a","3b","3c","3d","3e","3f","3g","3h","3i"],
+      ["4a","4b","4c","4d","4e","4f","4g","4h","4i"],
+      ["5a","5b","5c","5d","5e","5f","5g","5h","5i"],
+      ["6a","6b","6c","6d","6e","6f","6g","6h","6i"],
+      ["7a","7b","7c","7d","7e","7f","7g","7h","7i"]
     ];
 
     const imageBaseUrl = "https://i.postimg.cc/";
@@ -109,7 +94,7 @@
                     if (draggedPiece === piece) {
                       e.target.innerHTML = `<img src="${imageBaseUrl}${imageMap[piece]}" class="puzzle-piece"/>`;
                     } else {
-                      alert("Incorrect piece!");
+                      alert("Wrong piece!");
                     }
                   }}
                 ></div>
@@ -138,7 +123,7 @@
               src={`${imageBaseUrl}${imageMap[piece]}`}
               alt={piece}
               className="rotatable-piece"
-              draggable
+              draggable="true"
               onClick={(e) => {
                 const angle = parseInt(e.target.dataset.angle || "0");
                 const newAngle = (angle + 90) % 360;
@@ -147,6 +132,7 @@
               }}
               onDragStart={(e) => {
                 e.dataTransfer.setData("text/plain", piece);
+                e.dataTransfer.effectAllowed = "move";
               }}
             />
           ))}
@@ -158,21 +144,13 @@
       return (
         <div>
           <PuzzleGrid />
+          <h3>Drag these into the puzzle ↑</h3>
           <RotatingPieces />
         </div>
       );
     }
 
-    const root = document.getElementById("root");
-    ReactDOM.createRoot(root).render(<App />);
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
-</body>
-</html>
-<!-- partial -->
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.9/babel.min.js'></script>
-<script src='https://unpkg.com/react@18/umd/react.development.js'></script>
-<script src='https://unpkg.com/react-dom@18/umd/react-dom.development.js'></script>
 </body>
 </html>

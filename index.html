@@ -1,5 +1,64 @@
-<!-- same HEAD and styling as before -->
-<!-- only body and script below shown -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Touch Drag Jigsaw</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(9, 50px);
+      grid-gap: 1px;
+      justify-content: center;
+    }
+
+    .puzzle-piece {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border: none;
+    }
+
+    .empty-tile {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border: 1px dashed #aaa;
+      position: relative;
+    }
+
+    .rotating-pieces {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .draggable {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      touch-action: none;
+      position: absolute;
+      z-index: 1000;
+      pointer-events: auto;
+      user-select: none;
+    }
+
+    .piece-wrapper {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      display: inline-block;
+    }
+  </style>
+</head>
 
 <body>
   <h1>Touch-Drag Jigsaw</h1>

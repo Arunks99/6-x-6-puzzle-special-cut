@@ -68,7 +68,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.9/babel.min.js"></script>
 
-  <!-- Script -->
   <script type="text/babel">
     const imageGrid = [
       ["1a", "1b", "1c", "1d", "1e", "1f", "1g", "1h", "1i"],
@@ -82,6 +81,7 @@
 
     const imageBaseUrl = "https://i.postimg.cc/";
     const imageMap = {
+      // (same full mapping as before — keep all 63 keys here)
       "1a": "j5NS24js/1a.png", "1b": "L5p61gqj/1b.png", "1c": "vTt8L89k/1c.png", "1d": "SNmxQ8bh/1d.png",
       "1e": "QNQMrmPm/1e.png", "1f": "02Z2zQ9J/1f.png", "1g": "zGBDKrf2/1g.png", "1h": "DzhwfHqc/1h.png", "1i": "TP5RNJgr/1i.png",
       "2a": "GhgdMBkY/2a.png", "2b": "50wfb9Py/2b.png", "2c": "0Qvs67sg/2c.png", "2d": "cChZt9GN/2d.png",
@@ -114,7 +114,7 @@
               <div
                 key={id}
                 className="empty-tile"
-                onTouchStart={(e) => e.preventDefault()}
+                data-id={id}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   const data = e.dataTransfer.getData("text/plain");
@@ -163,7 +163,7 @@
           setPlaced((prev) => ({ ...prev, [target]: piece }));
           setRemaining((prev) => prev.filter((p) => p !== piece));
         } else {
-          alert("Wrong piece! Try again.");
+          alert("Wrong piece!");
         }
       };
 
@@ -172,6 +172,7 @@
         img.style.position = "absolute";
         img.style.left = e.touches[0].clientX - 25 + "px";
         img.style.top = e.touches[0].clientY - 25 + "px";
+        img.style.zIndex = 9999;
         document.body.appendChild(img);
 
         const move = (moveEvent) => {
@@ -181,12 +182,10 @@
 
         const end = (endEvent) => {
           const touch = endEvent.changedTouches[0];
-          const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-          if (dropTarget?.classList.contains("empty-tile")) {
-            const targetId = dropTarget.getAttribute("data-id") || dropTarget.dataset?.id;
-            if (targetId) {
-              handleDrop(targetId, piece);
-            }
+          const target = document.elementFromPoint(touch.clientX, touch.clientY);
+          const tileId = target?.closest(".empty-tile")?.getAttribute("data-id");
+          if (tileId) {
+            handleDrop(tileId, piece);
           }
           img.remove();
           document.removeEventListener("touchmove", move);
@@ -208,4 +207,3 @@
     ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
 </body>
-</html>
